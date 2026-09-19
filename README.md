@@ -43,7 +43,8 @@
 npx expo start
 ```
 ### Открытие приложения на устройстве
-После запуска команды в терминале отобразится QR-код. 
+После запуска ко
+манды в терминале отобразится QR-код. 
 
 Подключение:
 Отсканируйте QR-код камерой или приложением Expo Go. 
@@ -83,3 +84,181 @@ npx expo start
 После того, как вы разработали свое приложение, вы можете поделиться им со своими товарищами по команде для review-обзора.
 
 Наконец, вы можете создавать и отправлять свой проект в магазины приложений.
+
+# Конспект: Разработка на React Native и Expo
+
+## Архитектура и стек
+* **Платформы:** Android, iOS, Web (единая кодовая база)
+* **Инструменты:** Expo SDK, TypeScript, Expo Router
+
+## План разработки
+1. Инициализация проекта из шаблона.
+2. Настройка нижних вкладок (Tabs) через Expo Router.
+3. Верстка интерфейса с помощью Flexbox.
+4. Интеграция с галереей устройства для выбора фото.
+5. Создание интерфейса стикеров через `Modal` и `FlatList`.
+6. Добавление жестов для управления стикерами.
+7. Сохранение скриншотов в память устройства.
+8. Адаптация различий Android, iOS и Web.
+9. Настройка статус-бара, Splash Screen и иконки.
+
+## Команды CLI
+* Создать проект: `npx create-expo-app@latest my-app`
+* Запустить сервер: `npx expo start`
+* Установить зависимости: `npx expo install [package-name]`
+
+## Базовый шаблон (`app/index.tsx`)
+
+```tsx
+import { StyleSheet, Text, View } from 'react-native';
+
+export default function Index() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>Hello World!</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#25292e',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text: {
+    color: '#fff',
+  },
+});
+```
+
+## Шаг 1. Инициализация и подготовка активов
+
+### Команды в терминале
+```bash
+# Создание проекта StickerSmash
+npx create-expo-app@latest StickerSmash
+
+# Выберите шаблон по умолчанию (Select an Expo SDK version > SDK 57)
+
+# Переход в директорию проекта
+cd StickerSmash
+```
+
+### Подготовка ресурсов
+1. Скачать архив активов.
+2. Распаковать и заменить стандартные файлы в директории: `StickerSmash/assets/images`.
+
+### Очистка проекта
+Запустить скрипт для удаления дефолтного шаблонного кода:
+```bash
+npm run reset-project
+```
+## Шаг 2. Очистка и первый запуск приложения
+
+### Очистка шаблона
+Для удаления демонстрационного кода выполните:
+```bash
+npm run reset-project
+```
+*После выполнения скрипта в папке `app/` (или `src/app/`) останутся только два файла: `index.tsx` и `_layout.tsx`.*
+
+### Запуск сервера разработки
+```bash
+npx expo start
+```
+
+### Тестирование на устройствах
+* **Android:** Откройте приложение **Expo Go** -> выберите опцию **Scan QR Code**.
+* **iOS:** Отсканируйте QR-код из терминала через стандартное приложение **Камера**.
+* **Web:** Нажмите клавишу `w` в окне терминала для запуска веб-версии в браузере.
+## Шаг 3. Редактирование главного экрана
+
+### Основные правила стилизации в React Native
+* Стили задаются через JavaScript-объекты (не CSS).
+* Компоненты принимают проп `style`, в который передается объект стилей.
+* Поддерживаются шестнадцатеричные цвета (`#ffffff`), `rgba`, `hsl` и именованные цвета (например, `red`, `blue`).
+
+### Изменение файла `src/app/index.tsx`
+Замените код в файле на следующий вариант (с темным фоном и белым текстом):
+
+```tsx
+import { Text, View, StyleSheet } from 'react-native';
+
+export default function Index() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>Home screen</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#25292e',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text: {
+    color: '#fff',
+  },
+});
+```
+## Шаг 4. Навигация (Expo Router)
+
+Маршрутизация в Expo основана на файловой структуре папки `src/app`.
+
+### 1. Создание экрана About (`src/app/about.tsx`)
+```tsx
+import { Text, View, StyleSheet } from 'react-native';
+
+export default function AboutScreen() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>About screen</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#25292e', justifyContent: 'center', alignItems: 'center' },
+  text: { color: '#fff' },
+});
+```
+
+### 2. Настройка заголовков (`src/app/_layout.tsx`)
+```tsx
+import { Stack } from 'expo-router';
+
+export default function RootLayout() {
+  return (
+    <Stack>
+      <Stack.Screen name="index" options={{ title: 'Home' }} />
+      <Stack.Screen name="about" options={{ title: 'About' }} />
+    </Stack>
+  );
+}
+```
+
+### 3. Переход между экранами (`src/app/index.tsx`)
+```tsx
+import { Text, View, StyleSheet } from 'react-native';
+import { Link } from 'expo-router';
+
+export default function Index() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>Home screen</Text>
+      <Link href="/about" style={styles.button}>Go to About screen</Link>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#25292e', alignItems: 'center', justifyContent: 'center' },
+  text: { color: '#fff' },
+  button: { fontSize: 20, textDecorationLine: 'underline', color: '#fff' },
+});
+```
